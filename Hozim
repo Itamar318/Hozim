@@ -1,0 +1,180 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Google Drive API Integration",
+    "version": "v3",
+    "description": "Schema for integrating GPT with Google Drive for reading and writing files."
+  },
+  "servers": [
+    {
+      "url": "https://www.googleapis.com/drive/v3",
+      "description": "Base URL for Google Drive API."
+    }
+  ],
+  "paths": {
+    "/files": {
+      "get": {
+        "operationId": "listFiles",
+        "summary": "List Files",
+        "description": "Retrieve a list of files from Google Drive.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Optional query to filter files (e.g., mimeType='application/vnd.google-apps.document').",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of files.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "files": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/File"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "uploadFile",
+        "summary": "Upload File",
+        "description": "Upload a new file to Google Drive.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The file to upload. Provide the full path to the file you want to upload."
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Metadata of the file.",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the file. Provide a custom name for the file."
+                      },
+                      "parents": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "The folder ID where the file will be stored. Replace with the actual folder ID, or leave empty to upload to the root directory."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/File"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{fileId}": {
+      "get": {
+        "operationId": "getFileMetadata",
+        "summary": "Get File Metadata",
+        "description": "Retrieve metadata of a specific file by its ID.",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "The ID of the file to retrieve. Replace `{fileId}` with the actual file ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File metadata retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/File"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "File": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The unique identifier of the file."
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the file."
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "The MIME type of the file."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://accounts.google.com/o/oauth2/auth",
+            "tokenUrl": "https://oauth2.googleapis.com/token",
+            "scopes": {
+              "https://www.googleapis.com/auth/drive": "Full access to Google Drive."
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": []
+    }
+  ],
+  "x-oauth-client-credentials": {
+    "client_id": "493618360793-fo807meeeki3vhdqg2khosn7h4i4dvjt.apps.googleusercontent.com",
+    "client_secret": "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",
+    "redirect_uri": "https://eu2.make.com/"
+  }
+}
